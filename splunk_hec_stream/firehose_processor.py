@@ -31,7 +31,6 @@ def lambda_handler(event, context):
             print(e)
             result_code = 'ProcessingFailed'
             events = [_['message'] for _ in payload['logEvents']]
-            # 何とか無理矢理JSONにしたほうがいいのかも？
         records.append({
             'recordId': record['recordId'],
             'result': result_code,
