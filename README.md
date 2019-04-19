@@ -1,3 +1,5 @@
+# Splunk HEC Stream
+
 ```python
 import logging
 import json

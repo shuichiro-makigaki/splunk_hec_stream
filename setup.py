@@ -5,7 +5,7 @@ setup(
     version='0.1',
     packages=['splunk_hec_stream'],
     url='https://github.com/shuichiro-makigaki/splunk_hec_stream',
-    license='',
+    license='MIT License',
     author='Shuichiro MAKIGAKI',
     author_email='shuichiro.makigaki@gmail.com',
     description=''
