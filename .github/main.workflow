@@ -1,24 +1,24 @@
-workflow "tox" {
+workflow "Tox" {
   resolves = [
-    "GitHub Action for Docker",
-    "GitHub Action for Docker-1",
+    "Tox - Python 3.7",
+    "Tox - Python 3.6",
   ]
   on = "push"
 }
 
-action "Filters for GitHub Actions" {
+action "Filter branch master" {
   uses = "actions/bin/filter@master"
   args = "branch master"
 }
 
-action "GitHub Action for Docker" {
+action "Tox - Python 3.7" {
   uses = "home-assistant/actions/py37-tox@master"
-  needs = ["Filters for GitHub Actions"]
   args = "-e py37"
+  needs = ["Filter branch master"]
 }
 
-action "GitHub Action for Docker-1" {
+action "Tox - Python 3.6" {
   uses = "home-assistant/actions/py36-tox@master"
-  needs = ["Filters for GitHub Actions"]
   args = "-e py36"
+  needs = ["Filter branch master"]
 }
