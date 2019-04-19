@@ -40,5 +40,5 @@ class TestFirehoseProcessor(unittest.TestCase):
         self.assertIn("source", data)
         self.assertIn("time", data)
         self.assertIn("host", data)
-        self.assertDictEqual(data["event"], {"key": "value_"})
+        self.assertDictEqual(data["event"], {"key": "value"})
 
