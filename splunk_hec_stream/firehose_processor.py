@@ -25,7 +25,7 @@ def lambda_handler(event, context):
                     message["raw"] = m["raw"]
                 else:
                     raise "Message must have event or raw key"
-                events.append(json.dumps(message))
+                events.append(json.dumps(message, ensure_ascii=False))
             result_code = 'Ok'
         except Exception as e:
             print(e)

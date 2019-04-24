@@ -9,7 +9,7 @@ from splunk_hec_stream.firehose_processor import lambda_handler
 from splunk_hec_stream.logging import SplunkHECStreamHandler
 
 
-class TestFirehoseProcessor(unittest.TestCase):
+class TestFirehoseProcessor1(unittest.TestCase):
     def setUp(self) -> None:
         self.stream = StringIO()
         self.logger = logging.getLogger('test')
@@ -42,3 +42,27 @@ class TestFirehoseProcessor(unittest.TestCase):
         self.assertIn("host", data)
         self.assertDictEqual(data["event"], {"key": "value"})
 
+
+class TestFirehoseProcessor2(unittest.TestCase):
+    def setUp(self) -> None:
+        self.stream = StringIO()
+        self.logger = logging.getLogger('test')
+        self.logger.setLevel(logging.INFO)
+        self.logger.handlers = []
+        self.logger.addHandler(SplunkHECStreamHandler(stream=self.stream))
+        self.logger.info({"寿限無": "寿限無"})
+        message = self.stream.getvalue()
+        data = json.dumps({'logEvents': [{'message': message}]}).encode()
+        self.event = {
+            'records': [
+                {
+                    'data': base64.b64encode(gzip.compress(data)),
+                    'recordId': 'record_id'
+                }
+            ]
+        }
+
+    def test_processor1(self):
+        d = lambda_handler(self.event, None)
+        data = base64.b64decode(d['records'][0]['data']).decode()
+        self.assertIn("寿限無", data)

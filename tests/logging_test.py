@@ -48,6 +48,11 @@ ln''')
         self.assertEqual(j["time"], 1555548439.791797)
         self.assertDictEqual(j["event"], {"key": "value"})
 
+    def test_handler6(self):
+        self.logger.info("寿限無、寿限無")
+        j = json.loads(self.stream.getvalue())
+        self.assertDictEqual(j["event"], {"message": "寿限無、寿限無"})
+
 
 class TestHandler2(unittest.TestCase):
     def setUp(self) -> None:
