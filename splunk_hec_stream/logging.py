@@ -1,6 +1,5 @@
 import json
 import logging
-from pathlib import Path
 import os
 
 
@@ -21,15 +20,10 @@ class SplunkHECStreamHandler(logging.StreamHandler):
                 record.msg = json.dumps(str(record.msg), ensure_ascii=False)
             return True
 
-    def __init__(self, index="main", source=None, host=None, sourcetype="_json", stream=None):
+    def __init__(self, index="main", source="%(pathname)s:%(funcName)s", host=os.uname()[1], sourcetype="_json", stream=None):
         super().__init__(stream=stream)
-        if source is None:
-            source = Path(__file__).absolute()
-        if host is None:
-            host = os.uname()[1]
-        self.name = self.__class__.__name__
         fmt = f'''{{
-            "loggingHandler": "{self.name}",
+            "loggingHandler": "{self.__class__.__name__}",
             "time": %(created)f,
             "host": "{host}",
             "index": "{index}",
