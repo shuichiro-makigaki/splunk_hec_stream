@@ -19,7 +19,7 @@ class TestHandler1(unittest.TestCase):
         self.logger.info({"key1": "value1"})
         j = json.loads(self.stream.getvalue())
         self.assertEqual(j["index"], "main")
-        self.assertIn("splunk_hec_stream/tests/logging_test.py:test_handler1", j["source"])
+        self.assertIn("tests/logging_test.py:test_handler1", j["source"])
         self.assertIn("time", j)
         self.assertIn("host", j)
         self.assertEqual(j["loggingHandler"], "SplunkHECStreamHandler")
