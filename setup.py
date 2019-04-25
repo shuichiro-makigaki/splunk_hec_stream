@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='splunk_hec_stream',
-    version='0.1',
+    version='0.2',
     packages=['splunk_hec_stream'],
     url='https://github.com/shuichiro-makigaki/splunk_hec_stream',
     license='MIT License',

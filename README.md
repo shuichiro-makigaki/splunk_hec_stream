@@ -1,5 +1,9 @@
 # Splunk HEC Stream
 
+Streaming logging handler for Splunk HEC
+
+## Example
+
 ```python
 import logging
 import json
