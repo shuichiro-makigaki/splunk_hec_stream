@@ -1,4 +1,4 @@
-workflow "Tox" {
+workflow "Tox on push" {
   resolves = [
     "Tox - Python 3.7",
     "Tox - Python 3.6",
@@ -21,4 +21,12 @@ action "Tox - Python 3.6" {
   uses = "home-assistant/actions/py36-tox@master"
   args = "-e py36"
   needs = ["Filter branch master"]
+}
+
+workflow "Tox on pull request" {
+  resolves = [
+    "Tox - Python 3.7",
+    "Tox - Python 3.6",
+  ]
+  on = "pull_request"
 }
