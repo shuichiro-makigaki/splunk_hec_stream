@@ -1,13 +1,27 @@
 # Splunk HEC Stream
 
-This is a streaming logging handler for Splunk HEC and is NOT an event sender of Splunk HEC endpoint.
+Python streaming logging handler for Splunk HEC
 
-Streaming logging handler is useful for some usecases:
+---
 
-* Use with AWS Lambda
-    * Send events to Splunk HEC endpoint via AWS Kinesis Firehose and CloudWarch Logs subscription filter
-* Use with log colllector such as Fluentd and Logstash
+This handler is NOT an event sender.
+The handler itself does not involve forwarding to Splunk HEC endpoint.
+
+This means that log sources don't have to be concerned about buffering, transforming and retrying.
+These functions are responsible for log forwarding services (such as AWS Kinesis Firehose, Fluentd, Logstash, etc.).
+
+## Use case
+
+* Forward logs from AWS Lambda functions to Splunk 
+    * Send events to Splunk HEC endpoint via AWS Kinesis Firehose and CloudWarch Logs
+* Use with log collector such as Fluentd and Logstash
     * Read events from log files and process them by log collector
+
+## How to install
+
+```
+pip3 install splunk-hec-stream
+```
 
 ## Example
 
@@ -29,11 +43,11 @@ logging.info("test")
 logging.info('''test
 ln''')
 logging.info(json.dumps({"key1": "value1"}))
-# You can overwrite logging time by _time extra key (must be float)
+# You can overwrite logged time by _time extra key (that must be float)
 logging.info({"key": "value"}, extra={'_time': datetime.utcnow().timestamp()})
 ```
 
-This code shows following logs to stdout:
+This example codes put following logs to stdout:
 
 ```json
 {"loggingHandler":"SplunkHECStreamHandler","time":1557301830.617483,"host":"aws:lambda","index":"main","source":"splunk-logger-test","sourcetype":"_json","event":{"key1": "value1"}}
@@ -43,14 +57,20 @@ This code shows following logs to stdout:
 {"loggingHandler":"SplunkHECStreamHandler","time":1557269430.618213,"host":"aws:lambda","index":"main","source":"splunk-logger-test","sourcetype":"_json","event":{"key": "value"}}
 ```
 
-Splunk HEC endpoint can read them as events.
+By forwarding these JSON lines to Splunk HEC endpoint, Splunk can read and store them as events.
 
-## Use with AWS Lamnda
+## Use with AWS Lambda
+
+This package is useful to forward logs of AWS Lambda to Splunk.
+
+1. Lambda functions put logs to CloudWatch,
+1. Subscription Filter forwards them to Firehose,
+1. and the Firehose forwards them to Splunk.
 
 ### 1. Configure AWS Kinesis Firehose to send events to Splunk HEC endpoint
 
-`splunk_hec_stream/firehose_processor.py` can be used for stream processor lambda.
+`splunk_hec_stream/firehose_processor.py` can be used for event processor lambda.
 
-### 2. Configure CloudWatch Logs subscription filter, and send the evnets to the AWS Kinesis Firehose stream
+### 2. Configure CloudWatch Logs subscription filter, and send the filtered events to the Firehose stream
 
-`splunk_hec_stream` adds `loggingHandler` key to events, and the key is used for filtering only Splunk HEC events.
+`loggingHandler` key is used to filter logs that forward to Splunk HEC endpoint.
