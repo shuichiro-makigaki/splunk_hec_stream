@@ -64,13 +64,42 @@ By forwarding these JSON lines to Splunk HEC endpoint, Splunk can read and store
 This package is useful to forward logs of AWS Lambda to Splunk.
 
 1. Lambda functions put logs to CloudWatch,
-1. Subscription Filter forwards them to Firehose,
-1. and the Firehose forwards them to Splunk.
+2. Subscription Filter forwards them to Firehose,
+3. and the Firehose forwards them to Splunk.
 
-### 1. Configure AWS Kinesis Firehose to send events to Splunk HEC endpoint
+### How to
 
-`splunk_hec_stream/firehose_processor.py` can be used for event processor lambda.
+1. Create a lambda layer that contains this library.
+2. Configure Kinesis Firehose to send events to Splunk HEC endpoint
+    * `site-packages/splunk_hec_stream/contrib/aws_firehose_splunk_hec_stream_processor.py` can be used for event processor lambda.
+3. Configure CloudWatch Logs subscription filter, and send the filtered events to the Firehose stream
+    * `loggingHandler` key is used to filter logs that forward to Splunk HEC endpoint.
 
-### 2. Configure CloudWatch Logs subscription filter, and send the filtered events to the Firehose stream
+### Terraform
 
-`loggingHandler` key is used to filter logs that forward to Splunk HEC endpoint.
+`contrib/terraform` directory contains Terraform modules for above forwarding system.
+
+```hcl-terraform
+provider "aws" {}
+
+variable "python_lib_path" {
+  default = "/usr/local/lib/python3.7/site-packages"
+}
+
+module "handler_layer" {
+  source     = "github.com/shuichiro-makigaki/splunk_hec_stream//contrib/terraform/aws_lambda_layer"
+  layer_name = "splunk_hec_stream_handler"
+  lib_path   = "${var.python_lib_path}/splunk_hec_stream"
+}
+
+module "firehose_processor" {
+  source                  = "github.com/shuichiro-makigaki/splunk_hec_stream//contrib/terraform/aws_firehose"
+  lib_path                = "${var.python_lib_path}/splunk_hec_stream"
+  hec_endpoint            = "https://example.com"
+  hec_token               = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+  layer_arn               = module.handler_layer.arn
+  s3_delivery_bucket_name = "XXXXXXXX"
+}
+```
+
+Variable `python_lib_path` should be replaced following your side.
