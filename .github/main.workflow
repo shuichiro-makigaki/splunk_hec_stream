@@ -1,7 +1,8 @@
-workflow "Tox on push" {
+workflow "Test on push" {
   resolves = [
-    "Tox - Python 3.7",
     "Tox - Python 3.6",
+    "Tox - Python 3.7",
+    "Terraform validate",
   ]
   on = "push"
 }
@@ -23,10 +24,27 @@ action "Tox - Python 3.6" {
   needs = ["Filter branch master"]
 }
 
-workflow "Tox on pull request" {
+workflow "Test on pull request" {
   resolves = [
     "Tox - Python 3.7",
     "Tox - Python 3.6",
+    "Terraform validate"
   ]
   on = "pull_request"
+}
+
+action "Terraform init" {
+  uses = "hashicorp/terraform-github-actions/init@v0.3.1"
+  needs = ["Filter branch master"]
+  env = {
+    TF_ACTION_WORKING_DIR = "./contrib/terraform"
+  }
+}
+
+action "Terraform validate" {
+  uses = "hashicorp/terraform-github-actions/validate@v0.3.1"
+  needs = ["Terraform init"]
+  env = {
+    TF_ACTION_WORKING_DIR = "./contrib/terraform"
+  }
 }
