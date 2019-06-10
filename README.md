@@ -69,32 +69,32 @@ This package is useful to forward logs of AWS Lambda to Splunk.
 
 ### How to
 
-1. Create a lambda layer that contains this library.
+1. Create a lambda layer that contains this library
 2. Configure Kinesis Firehose to send events to Splunk HEC endpoint
-    * `site-packages/splunk_hec_stream/contrib/aws_firehose_splunk_hec_stream_processor.py` can be used for event processor lambda.
+    * `/contrib/aws_firehose_splunk_hec_stream_processor.py` can be used for event processor lambda.
 3. Configure CloudWatch Logs subscription filter, and send the filtered events to the Firehose stream
-    * `loggingHandler` key is used to filter logs that forward to Splunk HEC endpoint.
+    * `loggingHandler` key in JSON can be used to filter logs that forward to Splunk HEC endpoint.
 
 ### Terraform
 
-`contrib/terraform` directory contains Terraform modules for above forwarding system.
+`/contrib/terraform` directory contains Terraform modules for above forwarding system.
 
 ```hcl-terraform
 provider "aws" {}
 
 variable "python_lib_path" {
-  default = "/usr/local/lib/python3.7/site-packages"
+  default = "/usr/local/lib/python3.7/site-packages/splunk_hec_stream"
 }
 
 module "handler_layer" {
   source     = "github.com/shuichiro-makigaki/splunk_hec_stream//contrib/terraform/aws_lambda_layer"
   layer_name = "splunk_hec_stream_handler"
-  lib_path   = "${var.python_lib_path}/splunk_hec_stream"
+  lib_path   = var.python_lib_path
 }
 
 module "firehose_processor" {
   source                  = "github.com/shuichiro-makigaki/splunk_hec_stream//contrib/terraform/aws_firehose"
-  lib_path                = "${var.python_lib_path}/splunk_hec_stream"
+  lib_path                = var.python_lib_path
   hec_endpoint            = "https://example.com"
   hec_token               = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   layer_arn               = module.handler_layer.arn
